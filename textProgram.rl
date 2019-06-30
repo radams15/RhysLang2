@@ -7,3 +7,5 @@ float c = 5.2;
 char d = 5;
 
 printf(a);
+
+printf(7);

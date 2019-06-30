@@ -5,7 +5,7 @@ class Object:
         self.value = value
 
     def __repr__(self):
-        return f"{self.__class__.__name__}({self.name}, {self.value})"
+        return f"{self.__class__.__name__}({self.value})"
 
 
 class Number(Object):
@@ -32,7 +32,7 @@ class FunctionCall:
         self.args = args
 
     def __repr__(self):
-        return f"Call To{self.__class__.__name__} With {self.args}"
+        return f"Call To {self.__class__.__name__} With {self.args}"
 
 class Printf(FunctionCall):
     pass

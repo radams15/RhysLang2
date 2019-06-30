@@ -9,9 +9,11 @@ if __name__ == '__main__':
 
     tokens = lex.lex(file_data)
 
-    for line, token in tokens.items():
-        print(token)
+    #for line, token in tokens.items():
+    #    print(token)
 
-    #parse = parser.Parser()
+    parser = parser.Parser()
+
+    parser.parse(tokens)
 
 

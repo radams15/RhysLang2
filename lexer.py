@@ -14,6 +14,9 @@ class Lexer:
     def _strip(self, data):
         return [[x for x in y if x is not ""] for y in data]
 
+    def _sort_dict(self, dictionary):
+        return {x:dictionary[x] for x in sorted(dictionary.keys())}
+
     def _find(self, pattern, data) -> dict:
         out = {}
         end = '.*'
@@ -42,23 +45,27 @@ class Lexer:
 
                 if class_type == "string":
                     token = ast.String(name)
+                    token.value = value[1:-1]
                 elif class_type == "int":
                     token = ast.Integer(name)
+                    token.value = value
                 elif class_type == "float":
                     token = ast.Float(name)
+                    token.value = value
                 elif class_type == "char":
                     token = ast.Character(name)
+                    token.value = value
                 elif class_type == "bool":
                     token = ast.Boolean(name)
+                    token.value = value
                 else:
                     raise errors.UnknownTypeError(f"Unknown Type {type}")
-
-                token.value = value
 
                 out[line] = token
 
         if printfs:
             for line, printf in printfs.items():
-                out[line] = ast.Printf(printf[1])
+                args = printf[1]
+                out[line] = ast.Printf(args)
 
-        return out
+        return self._sort_dict(out)
