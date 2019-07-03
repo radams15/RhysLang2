@@ -1,19 +1,18 @@
 import lexer
-import parser
+import executor
 
 if __name__ == '__main__':
     file_data = open("textProgram.rl", "r").read()
-    #print(fileData)
 
-    lex = lexer.Lexer()
+    lex = lexer.lexify
 
-    tokens = lex.lex(file_data)
+    tokens = lex(file_data)
 
-    #for line, token in tokens.items():
-    #    print(token)
+    for tok in tokens:
+        print(tok)
 
-    parser = parser.Parser()
+    executor = executor.Executor()
 
-    parser.parse(tokens)
+    executor.execute(tokens)
 
 

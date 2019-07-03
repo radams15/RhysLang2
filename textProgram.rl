@@ -1,11 +1,4 @@
-string a = "hello";
-
-int b = 4;
-
-float c = 5.2;
-
-char d = 5;
-
-printf(a);
-
-printf(7);
+a = "gdsgd";
+b = 532;
+c = 6.1214;
+d = sff;

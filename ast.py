@@ -21,9 +21,6 @@ class Float(Number):
 class String(Object):
     pass
 
-class Character(Object):
-    pass
-
 class Boolean(Object):
     pass
 

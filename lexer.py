@@ -1,71 +1,87 @@
-import re
-import ast
-import errors
+import ply.lex as lex
 
-DEFINITION = 0
-DECLARATION = 1
+tokens = (
+    'FLOAT',
+    'INT',
+    'STRING',
+    'BOOL',
+    'PLUS',
+    'MINUS',
+    'TIMES',
+    'DIVIDE',
+    'LPAREN',
+    'RPAREN',
+    'EQUALS',
+    'VAR',
+    'EOS',
+)
 
-class Lexer:
-    def __init__(self):
-        self.variable_pattern = re.compile(r"([a-zA-Z]+)\s*(.*)\s+=\s*(.*);")
-        self.if_pattern = re.compile(r"if\s*\((.*)\)\s*{\s*([\s\S]*)\s*}")
-        self.printf_pattern = re.compile(r"printf\((.*)\);")
+def t_FLOAT(t):
+    r'\d*\.\d+'
+    t.value = float(t.value)
+    return t
 
-    def _strip(self, data):
-        return [[x for x in y if x is not ""] for y in data]
+def t_EQUALS(t):
+    r'\='
+    return t
 
-    def _sort_dict(self, dictionary):
-        return {x:dictionary[x] for x in sorted(dictionary.keys())}
+def t_EOS(t):
+    r'\;'
+    return t
 
-    def _find(self, pattern, data) -> dict:
-        out = {}
-        end = '.*'
-        line = []
-        for m in re.finditer(end, data):
-            line.append(m.end())
-        for m in re.finditer(pattern, data):
-            line_num = next(i for i in range(len(line)) if line[i] > m.start(1))
-            out[line_num] = m
-        return out
+def t_INT(t):
+    r'\d+'
+    t.value = int(t.value)
+    return t
 
-    def lex(self, data):
-        out = {}
-        variables = self._find(self.variable_pattern, data)
-        printfs = self._find(self.printf_pattern, data)
+def t_STRING(t):
+    r'\".*\"'
+    t.value = str(t.value)[1:-1] # removes first and last speech marks
+    return t
 
-        if variables:
-            for line, variable in variables.items():
+def t_BOOL(t):
+    r'true|false|nil'
+    if t.value == "true":
+        value = True
+    elif t.value == "false":
+        value = False
+    else:
+        value = None
+    t.value = value
+    return t
 
-                if variable[1] and variable[2] and variable[3]:
-                    class_type = variable[1]
-                    name = variable[2]
-                    value = variable[3]
-                else:
-                    raise SyntaxError(f"Unknown Syntax On Line {line}: {variable}")
+def t_VAR(t):
+    r'([a-zA-Z_][a-zA-Z0-9_]*)'
+    return t
 
-                if class_type == "string":
-                    token = ast.String(name)
-                    token.value = value[1:-1]
-                elif class_type == "int":
-                    token = ast.Integer(name)
-                    token.value = value
-                elif class_type == "float":
-                    token = ast.Float(name)
-                    token.value = value
-                elif class_type == "char":
-                    token = ast.Character(name)
-                    token.value = value
-                elif class_type == "bool":
-                    token = ast.Boolean(name)
-                    token.value = value
-                else:
-                    raise errors.UnknownTypeError(f"Unknown Type {type}")
+def t_newline(t):
+    r'\n+'
+    t.lexer.lineno += len(t.value)
 
-                out[line] = token
+t_ignore  = ' \t'
 
-        if printfs:
-            for line, printf in printfs.items():
-                args = printf[1]
-                out[line] = ast.Printf(args)
+# Error handling rule
+def t_error(t):
+    print("Illegal character '%s'" % t.value[0])
+    t.lexer.skip(1)
 
-        return self._sort_dict(out)
+def group(expressions):
+    out = []
+    temp = []
+    for expr in expressions:
+        if expr.type != "EOS":
+            temp.append(expr)
+        else:
+            out.append(temp)
+            temp = []
+
+    out.append(temp)
+
+    return out
+
+def lexify(string):
+    lexer.input(string)
+    expressions = list(iter(lexer.token, None))
+    return group(expressions)
+
+lexer = lex.lex()
